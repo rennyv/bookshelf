@@ -10,6 +10,8 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
+import { useQuery, useMutation, queryCache } from 'react-query'
+import { client } from 'utils/api-client'
 // 🐨 you'll need useQuery, useMutation, and queryCache from 'react-query'
 // 🐨 you'll also need client from 'utils/api-client'
 import {useAsync} from 'utils/hooks'
@@ -55,6 +57,11 @@ function StatusButtons({user, book}) {
   // 🐨 search through the listItems you got from react-query and find the
   // one with the right bookId.
   const listItem = null
+
+  const [create] = useMutation(
+    ({bookId}) => client('list-items', {data: {bookId}, token: user.token })
+  )
+  
 
   // 💰 for all the mutations below, if you want to get the list-items cache
   // updated after this query finishes the use the `onSettled` config option
@@ -106,7 +113,7 @@ function StatusButtons({user, book}) {
         <TooltipButton
           label="Add to list"
           highlight={colors.indigo}
-          // 🐨 add an onClick here that calls create
+          onClick={() => create({bookId: book.id}) }
           icon={<FaPlusCircle />}
         />
       )}
