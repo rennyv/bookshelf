@@ -10,6 +10,10 @@ function useListItems(user){
     return listItems ?? []
 }
 
+const defaultMutationOptions = {
+    onSettled: () => queryCache.invalidateQueries('list-items')
+}
+
 function useListItem(user, bookId) {
     const listItems = useListItems(user)
     const listItem = listItems.find(li => li.bookId === bookId) ?? null
@@ -20,8 +24,22 @@ function useListItem(user, bookId) {
 function useUpdateListItem(user) {
     return useMutation(
         (updates) => client(`list-items/${updates.id}`, {method: 'PUT', data: updates, token: user.token }),
-        {onSettled: () => queryCache.invalidateQueries('list-items')}
+        defaultMutationOptions
       )
 }
 
-export {useListItem, useListItems, useUpdateListItem}
+function useRemoveListItem(user){
+    return useMutation(
+        ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token }),
+        defaultMutationOptions
+    )
+}
+
+function useCreateListItem(user) {
+    return useMutation(
+        ({bookId}) => client('list-items', {data: {bookId}, token: user.token }),
+        defaultMutationOptions
+    )
+}
+
+export {useListItem, useListItems, useUpdateListItem, useRemoveListItem, useCreateListItem}
