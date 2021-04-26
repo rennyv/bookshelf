@@ -2,8 +2,6 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
-import {useMutation, queryCache} from 'react-query'
-import {client} from 'utils/api-client'
 import {useUpdateListItem} from 'utils/list-items'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
