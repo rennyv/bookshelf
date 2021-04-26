@@ -57,27 +57,20 @@ function StatusButtons({user, book}) {
   
   const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
+  const [remove] = useMutation(
+    ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token }),
+    {onSettled: () => queryCache.invalidateQueries('list-items')}
+  )
+
   const [create] = useMutation(
     ({bookId}) => client('list-items', {data: {bookId}, token: user.token }),
     {onSettled: () => queryCache.invalidateQueries('list-items')}
   )
-  
-
-  // 💰 for all the mutations below, if you want to get the list-items cache
-  // updated after this query finishes the use the `onSettled` config option
-  // to queryCache.invalidateQueries('list-items')
 
   // 🐨 call useMutation here and assign the mutate function to "update"
   // the mutate function should call the list-items/:listItemId endpoint with a PUT
   //   and the updates as data. The mutate function will be called with the updates
   //   you can pass as data.
-
-  // 🐨 call useMutation here and assign the mutate function to "remove"
-  // the mutate function should call the list-items/:listItemId endpoint with a DELETE
-
-  // 🐨 call useMutation here and assign the mutate function to "create"
-  // the mutate function should call the list-items endpoint with a POST
-  // and the bookId the listItem is being created for.
 
   return (
     <React.Fragment>
@@ -106,7 +99,7 @@ function StatusButtons({user, book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          // 🐨 add an onClick here that calls remove
+          onClick={() => remove({id: listItem.id})}
           icon={<FaMinusCircle />}
         />
       ) : (
