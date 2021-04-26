@@ -50,16 +50,16 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({user, book}) {
-  // 🐨 call useQuery here to get the listItem (if it exists)
-  // queryKey should be 'list-items'
-  // queryFn should call the list-items endpoint
-
-  // 🐨 search through the listItems you got from react-query and find the
-  // one with the right bookId.
-  const listItem = null
+  const {data: listItems} = useQuery({
+    queryKey: 'list-items',
+    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
+  })
+  
+  const listItem = listItems?.find(li => li.bookId === book.id) ?? null
 
   const [create] = useMutation(
-    ({bookId}) => client('list-items', {data: {bookId}, token: user.token })
+    ({bookId}) => client('list-items', {data: {bookId}, token: user.token }),
+    {onSettled: () => queryCache.invalidateQueries('list-items')}
   )
   
 
