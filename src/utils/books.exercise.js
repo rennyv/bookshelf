@@ -35,6 +35,13 @@ const getBookSearchConfig = (query, user) => ({
     client(`books?query=${encodeURIComponent(query)}`, {
       token: user.token,
     }).then(data => data.books),
+    config: {
+      onSuccess(books) {
+        for (const book of books) {
+          setQueryDataForBook(book)
+        }
+      }
+    }
 })
 
 async function refetchBookSearchQuery(user) {
@@ -42,4 +49,8 @@ async function refetchBookSearchQuery(user) {
   await queryCache.prefetchQuery(getBookSearchConfig('', user))
 }
 
-export {useBookSearch, useBook, refetchBookSearchQuery}
+function setQueryDataForBook(book){
+  queryCache.setQueryData(['book', {bookId: book.id}], book)
+}
+
+export {useBookSearch, useBook, refetchBookSearchQuery, setQueryDataForBook}
