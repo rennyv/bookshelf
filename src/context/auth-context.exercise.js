@@ -9,14 +9,6 @@ import {useAsync} from 'utils/hooks'
 const AuthContext = React.createContext()
 AuthContext.displayName = 'AuthContext'
 
-function useAuth(){
-    const context = React.useContext(AuthContext)
-    if (context === undefined) {
-        throw new Error(`useAuth must be used within a AuthProvider`)
-    }
-    return context
-}
-
 async function getUser() {
   let user = null
 
@@ -37,6 +29,7 @@ function AuthProvider(props) {
     isIdle,
     isError,
     isSuccess,
+    status,
     run,
     setData,
   } = useAsync()
@@ -67,8 +60,23 @@ function AuthProvider(props) {
         <AuthContext.Provider value={value} {...props} />
     )
   }
+
+  throw new Error(`Unhandled status: ${status}`)
 }
 
-export {AuthProvider, useAuth, AuthContext}
+function useAuth(){
+  const context = React.useContext(AuthContext)
+  if (context === undefined) {
+      throw new Error(`useAuth must be used within a AuthProvider`)
+  }
+  return context
+}
+
+function useClient() {
+  const {user: {token}} = useAuth()
+  return React.useCallback((endpoint, config) => client(endpoint, {...config, token}), [token])
+}
+
+export {AuthProvider, useAuth, AuthContext, useClient}
 
 

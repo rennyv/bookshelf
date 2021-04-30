@@ -1,14 +1,13 @@
 import {useQuery, useMutation, queryCache} from 'react-query'
-import {useAuth} from 'context/auth-context'
+import {useClient} from 'context/auth-context'
 import {setQueryDataForBook} from './books'
-import {client} from './api-client'
 
 function useListItems() {
-  const {user} = useAuth()
+  const client = useClient()
   const {data} = useQuery({
     queryKey: 'list-items',
     queryFn: () =>
-      client(`list-items`, {token: user.token}).then(data => data.listItems),
+      client(`list-items`).then(data => data.listItems),
     onSuccess: async listItems => {
       for (const listItem of listItems) {
         setQueryDataForBook(listItem.book)
@@ -19,8 +18,7 @@ function useListItems() {
 }
 
 function useListItem(bookId) {
-  const {user} = useAuth()
-  const listItems = useListItems(user)
+  const listItems = useListItems()
   return listItems.find(li => li.bookId === bookId) ?? null
 }
 
@@ -31,13 +29,12 @@ const defaultMutationOptions = {
 }
 
 function useUpdateListItem(options) {
-  const {user} = useAuth()
+  const client = useClient()
   return useMutation(
     updates =>
       client(`list-items/${updates.id}`, {
         method: 'PUT',
         data: updates,
-        token: user.token,
       }),
     {
       onMutate(newItem) {
@@ -58,9 +55,9 @@ function useUpdateListItem(options) {
 }
 
 function useRemoveListItem(options) {
-  const {user} = useAuth()
+  const client = useClient()
   return useMutation(
-    ({id}) => client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
+    ({id}) => client(`list-items/${id}`, {method: 'DELETE'}),
     {
       onMutate(removedItem) {
         const previousItems = queryCache.getQueryData('list-items')
@@ -78,9 +75,9 @@ function useRemoveListItem(options) {
 }
 
 function useCreateListItem(options) {
-  const {user} = useAuth()
+  const client = useClient()
   return useMutation(
-    ({bookId}) => client(`list-items`, {data: {bookId}, token: user.token}),
+    ({bookId}) => client(`list-items`, {data: {bookId}}),
     {...defaultMutationOptions, ...options},
   )
 }
