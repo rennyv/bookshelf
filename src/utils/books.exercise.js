@@ -51,17 +51,12 @@ function useBook(bookId) {
   return data ?? loadingBook
 }
 
-// we don't want to accept the user here anymore. Instead we'll make a new
-// hook that gets the user and then returns this function
-// (memoized with React.useCallback)
-// 🐨 create a useRefetchBookSearchQuery hook here which:
-// 1. Gets the user from the AuthContext
-// 2. Returns a memoized callback (React.useCallback) version of this
-// refetchBookSearchQuery function. It should no longer need to accept user as
-// an argument and instead lists it as a dependency.
-async function refetchBookSearchQuery(user) {
-  queryCache.removeQueries('bookSearch')
-  await queryCache.prefetchQuery(getBookSearchConfig('', user))
+function useRefetchBookSearchQuery(){
+  const {user} = React.useContext(AuthContext)
+  return React.useCallback(async function refetchBookSearchQuery() {
+    queryCache.removeQueries('bookSearch')
+    await queryCache.prefetchQuery(getBookSearchConfig('', user))
+  }, [user])
 }
 
 const bookQueryConfig = {
@@ -73,4 +68,4 @@ function setQueryDataForBook(book) {
   queryCache.setQueryData(['book', {bookId: book.id}], book, bookQueryConfig)
 }
 
-export {useBook, useBookSearch, refetchBookSearchQuery, setQueryDataForBook}
+export {useBook, useBookSearch, useRefetchBookSearchQuery, setQueryDataForBook}
