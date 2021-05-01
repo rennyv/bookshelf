@@ -16,6 +16,7 @@ import {
   useRemoveListItem,
   useCreateListItem,
 } from 'utils/list-items'
+import {unstable_trace as trace} from 'scheduler/tracing'
 import * as colors from 'styles/colors'
 import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
@@ -27,7 +28,9 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
     if (isError) {
       reset()
     } else {
-      run(onClick())
+      trace(`Click ${label}`, performance.now(), () => {
+        run(onClick())
+      })
     }
   }
 

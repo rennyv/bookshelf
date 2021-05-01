@@ -21,7 +21,7 @@ function Profiler({phases, metadata, ...props}){
         if (!phases || phases.includes(phase)){
             queue.push({
                 metadata,
-                id, phase, actualDuration, baseDuration, startTime, commitTime, interactions,
+                id, phase, actualDuration, baseDuration, startTime, commitTime, interactions: [...interactions],
             })
         }
     }
