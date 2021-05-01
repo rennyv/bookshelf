@@ -11,6 +11,7 @@ import {formatDate} from 'utils/misc'
 import {useListItem, useUpdateListItem} from 'utils/list-items'
 import * as mq from 'styles/media-queries'
 import * as colors from 'styles/colors'
+import {Profiler} from 'components/profiler'
 import {Spinner, Textarea, ErrorMessage} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
@@ -23,6 +24,7 @@ function BookScreen() {
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
   return (
+    <Profiler id="Book Screen" metadata={{bookId, listItemId: listItem?.id}}>
     <div>
       <div
         css={{
@@ -76,6 +78,7 @@ function BookScreen() {
         <NotesTextarea listItem={listItem} />
       ) : null}
     </div>
+    </Profiler>
   )
 }
 
