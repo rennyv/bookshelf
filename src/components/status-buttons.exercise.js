@@ -16,7 +16,7 @@ import {
   useRemoveListItem,
   useCreateListItem,
 } from 'utils/list-items'
-import {unstable_trace as trace} from 'scheduler/tracing'
+import {trace} from './profiler'
 import * as colors from 'styles/colors'
 import {useAsync} from 'utils/hooks'
 import {CircleButton, Spinner} from './lib'
