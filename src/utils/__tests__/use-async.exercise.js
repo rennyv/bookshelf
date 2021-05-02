@@ -42,7 +42,7 @@ test('calling run with a promise which resolves', async () => {
   act(() => {
     p = result.current.run(promise)
   })
-  
+
   expect(result.current).toEqual({
     status: 'pending',
     data: null,
@@ -125,7 +125,7 @@ test('calling run with a promise which rejects', async () => {
   act(() => {
     p = result.current.run(promise)
   })
-  
+
   expect(result.current).toEqual({
     status: 'pending',
     data: null,
@@ -188,7 +188,7 @@ test('calling run with a promise which rejects', async () => {
 
 test('can specify an initial state', async () => {
   const mockData = Symbol('resolved value')
-  const customInitialState = {status: 'resolved',data: mockData}
+  const customInitialState = {status: 'resolved', data: mockData}
   const {result} = renderHook(() => useAsync(customInitialState))
 
   expect(result.current).toEqual({
@@ -211,10 +211,10 @@ test('can specify an initial state', async () => {
 test('can set the data', async () => {
   const mockData = Symbol('resolved value')
   const {result} = renderHook(() => useAsync())
-  
+
   act(() => {
     result.current.setData(mockData)
-  })  
+  })
 
   expect(result.current).toEqual({
     status: 'resolved',
@@ -236,10 +236,10 @@ test('can set the data', async () => {
 test('can set the error', async () => {
   const mockData = Symbol('error value')
   const {result} = renderHook(() => useAsync())
-  
+
   act(() => {
     result.current.setError(mockData)
-  })  
+  })
 
   expect(result.current).toEqual({
     status: 'rejected',
@@ -275,5 +275,8 @@ test('No state updates happen if the component is unmounted while pending', asyn
 })
 
 test('calling "run" without a promise results in an early error', async () => {
-    
+  const {result} = renderHook(() => useAsync())
+  expect(() => result.current.run()).toThrowErrorMatchingInlineSnapshot(
+    `"The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?"`,
+  )
 })
