@@ -12,11 +12,7 @@ function deferred() {
 }
 
 test('calling run with a promise which resolves', async () => {
-  let resolve, reject
-  const promise = new Promise((res, rej) => {
-    resolve = res
-    reject = rej
-  })
+  const {promise, resolve} = deferred()
 
   const {result} = renderHook(() => useAsync())
   expect(result.current).toEqual({
@@ -71,6 +67,25 @@ test('calling run with a promise which resolves', async () => {
     isLoading: false,
     isError: false,
     isSuccess: true,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
+
+  act(() => {
+    result.current.reset()
+  })
+  expect(result.current).toEqual({
+    status: 'idle',
+    data: null,
+    error: null,
+
+    isIdle: true,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
 
     run: expect.any(Function),
     reset: expect.any(Function),
