@@ -35,8 +35,9 @@ test('calling run with a promise which resolves', async () => {
     setError: expect.any(Function),
   })
 
+  let p
   act(() => {
-    result.current.run(promise)
+    p = result.current.run(promise)
   })
   
   expect(result.current).toEqual({
@@ -48,6 +49,28 @@ test('calling run with a promise which resolves', async () => {
     isLoading: true,
     isError: false,
     isSuccess: false,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
+
+  const resolvedValue = Symbol('resolved value')
+  await act(async () => {
+    resolve(resolvedValue)
+    await p
+  })
+
+  expect(result.current).toEqual({
+    status: 'resolved',
+    data: resolvedValue,
+    error: null,
+
+    isIdle: false,
+    isLoading: false,
+    isError: false,
+    isSuccess: true,
 
     run: expect.any(Function),
     reset: expect.any(Function),
