@@ -7,13 +7,6 @@ beforeAll(() => server.listen())
 afterAll(() => server.close())
 afterEach(() => server.resetHandlers())
 
-// 🐨 add a beforeAll to start the server with `server.listen()`
-// 🐨 add an afterAll to stop the server when `server.close()`
-// 🐨 afterEach test, reset the server handlers to their original handlers
-// via `server.resetHandlers()`
-
-// 🐨 flesh these out:
-
 test('calls fetch at the endpoint with the arguments for GET requests', async () => {
   const endpoint = 'test-endpoint'
   const mockResult ={ mockValue: 'VALUE'  }
@@ -25,21 +18,20 @@ test('calls fetch at the endpoint with the arguments for GET requests', async ()
   const result = await client(endpoint)
   expect(result).toEqual(mockResult)
 })
-// 🐨 add a server handler to handle a test request you'll be making
-// 💰 because this is the first one, I'll give you the code for how to do that.
-// const endpoint = 'test-endpoint'
-// const mockResult = {mockValue: 'VALUE'}
-// server.use(
-//   rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
-//     return res(ctx.json(mockResult))
-//   }),
-// )
-//
-// 🐨 call the client (don't forget that it's asynchronous)
-// 🐨 assert that the resolved value from the client call is correct
 
 test('adds auth token when a token is provided', async () => {
-  
+  const token = "FAKE_TOKEN"
+  let request
+  const endpoint = 'test-endpoint'
+  const mockResult ={ mockValue: 'VALUE'  }
+  server.use(
+    rest.get(`${apiURL}/${endpoint}`, async (req, res, ctx) => {
+      request = req
+      return res(ctx.json(mockResult))
+    })
+  )
+  await client(endpoint, {token})
+  expect(request.headers.get('Authorization')).toEqual(`Bearer ${token}`)
 })
 // 🐨 create a fake token (it can be set to any string you want)
 // 🐨 create a "request" variable with let
