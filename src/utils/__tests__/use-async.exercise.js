@@ -95,7 +95,88 @@ test('calling run with a promise which resolves', async () => {
 })
 
 test('calling run with a promise which rejects', async () => {
-    
+  const {promise, reject} = deferred()
+
+  const {result} = renderHook(() => useAsync())
+  expect(result.current).toEqual({
+    status: 'idle',
+    data: null,
+    error: null,
+
+    isIdle: true,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
+
+  let p
+  act(() => {
+    p = result.current.run(promise)
+  })
+  
+  expect(result.current).toEqual({
+    status: 'pending',
+    data: null,
+    error: null,
+
+    isIdle: false,
+    isLoading: true,
+    isError: false,
+    isSuccess: false,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
+
+  const rejectedValue = Symbol('rejected value')
+  await act(async () => {
+    reject(rejectedValue)
+    await p.catch(() => {
+      //ignore error
+    })
+  })
+
+  expect(result.current).toEqual({
+    status: 'rejected',
+    data: null,
+    error: rejectedValue,
+
+    isIdle: false,
+    isLoading: false,
+    isError: true,
+    isSuccess: false,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
+
+  act(() => {
+    result.current.reset()
+  })
+  expect(result.current).toEqual({
+    status: 'idle',
+    data: null,
+    error: null,
+
+    isIdle: true,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+
+    run: expect.any(Function),
+    reset: expect.any(Function),
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+  })
 })
 // 🐨 this will be very similar to the previous test, except you'll reject the
 // promise instead and assert on the error state.
