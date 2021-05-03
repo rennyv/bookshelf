@@ -34,7 +34,20 @@ test('renders all the book information', async () => {
 
     render(<App />, {wrapper: AppProviders})
     await waitForElementToBeRemoved(() => screen.getByLabelText(/loading/i))
-    screen.debug()
+
+    expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
+    expect(screen.getByText(book.author)).toBeInTheDocument()
+    expect(screen.getByText(book.publisher)).toBeInTheDocument()
+    expect(screen.getByText(book.synopsis)).toBeInTheDocument()
+    expect(screen.getByRole('img', {name: /book cover/i})).toHaveAttribute('src', book.coverImageUrl)
+
+    expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /remove from list/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /mark as read/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /mark as unread/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('textarea', {name: /notes/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', {name: /star/i})).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/start date/i)).not.toBeInTheDocument()
 })
 // 🐨 "authenticate" the client by setting the auth.localStorageKey in localStorage to some string value (can be anything for now)
 
