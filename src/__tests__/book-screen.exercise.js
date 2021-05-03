@@ -21,21 +21,29 @@ afterEach(async () => {
     ])
 })
 
-test('renders all the book information', async () => {
-    const user = buildUser()
+async function loginAsUser(userProperties) {
+    const user = buildUser(userProperties)
     await usersDB.create(user)
     const authUser = await usersDB.authenticate(user)
     window.localStorage.setItem(auth.localStorageKey, authUser.token)
+
+    return authUser
+}
+
+const waitForLoadingToFinish = async () => await waitForElementToBeRemoved(() => [
+        ...screen.queryAllByLabelText(/loading/i),
+        ...screen.queryAllByText(/loading/i)
+    ])
+
+test('renders all the book information', async () => {
+    await loginAsUser()
 
     const book = await booksDB.create(buildBook())
     window.history.pushState({}, 'Test page', `/book/${book.id}`)
 
     render(<App />, {wrapper: AppProviders})
 
-    await waitForElementToBeRemoved(() => [
-        ...screen.queryAllByLabelText(/loading/i),
-        ...screen.queryAllByText(/loading/i)
-    ])
+    await waitForLoadingToFinish()
 
     expect(screen.getByRole('heading', {name: book.title})).toBeInTheDocument()
     expect(screen.getByText(book.author)).toBeInTheDocument()
@@ -53,29 +61,20 @@ test('renders all the book information', async () => {
 })
 
 test('can create a list item for the book', async () => {
-    const user = buildUser()
-    await usersDB.create(user)
-    const authUser = await usersDB.authenticate(user)
-    window.localStorage.setItem(auth.localStorageKey, authUser.token)
+    await loginAsUser()
 
     const book = await booksDB.create(buildBook())
     window.history.pushState({}, 'Test page', `/book/${book.id}`)
 
     render(<App />, {wrapper: AppProviders})
 
-    await waitForElementToBeRemoved(() => [
-        ...screen.queryAllByLabelText(/loading/i),
-        ...screen.queryAllByText(/loading/i)
-    ])
+    await waitForLoadingToFinish()
 
     const addToListButton = screen.getByRole('button', {name: /add to list/i})
     userEvent.click(addToListButton)
     expect(addToListButton).toBeDisabled()
 
-    await waitForElementToBeRemoved(() => [
-        ...screen.queryAllByLabelText(/loading/i),
-        ...screen.queryAllByText(/loading/i)
-    ])
+    await waitForLoadingToFinish()
 
     expect(screen.getByRole('button', {name: /mark as read/i})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /remove from list/i})).toBeInTheDocument()
