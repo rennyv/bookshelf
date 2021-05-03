@@ -9,15 +9,25 @@ import {App} from 'app'
 // 🐨 after each test, clear the queryCache and auth.logout
 
 test('renders all the book information', async () => {
+    const user = buildUser()
     window.localStorage.setItem(auth.localStorageKey, 'SOME_FAKE_TOKEN')
 
+    const book = buildBook()
+    window.history.pushState({}, 'Test page', `/book/${book.id}`)
     const originalFetch = window.fetch
     window.fetch = async (url, config) => {
         if (url.endsWith('/bootstrap')) {
             return {
                 ok: true, 
-                json: async () => ({user: {username: 'bob'}, listItems: []}),
+                json: async () => ({
+                    user: {...user, token: 'SOME_FAKE_TOKEN'}, 
+                    listItems: []}),
             }
+        } else if(url.endsWith(`/books/${book.id}`)){
+            return {
+                ok: true,
+                json: async () => ({book}),
+            } 
         }
         return originalFetch(url, config)
     }
