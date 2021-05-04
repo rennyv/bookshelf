@@ -68,3 +68,30 @@ test('can remove a list item for the book', async () => {
     expect(screen.getByRole('button', {name: /add to list/i})).toBeInTheDocument()
     expect(screen.queryByRole('button', {name: /remove from list/i})).not.toBeInTheDocument()
 })
+
+test('can mark a list item as read', async () => {
+    const user = await loginAsUser()
+    const book = await booksDB.create(buildBook())
+    const route = `/book/${book.id}`
+    const listItem = await listItemsDB.create(buildListItem({
+        owner: user, 
+        book,
+        finishDate: null
+    }))
+  
+    await render(<App />, {route, user})
+
+    const markAsRead = screen.getByRole('button', {name: /mark as read/i})
+    userEvent.click(markAsRead)
+    expect(markAsRead).toBeDisabled()
+
+    await waitForLoadingToFinish()
+
+    expect(screen.getByRole('button', {name: /mark as unread/i})).toBeInTheDocument()
+    const startAndFinishDateNode = screen.getByLabelText(/start and finish date/i)
+    expect(startAndFinishDateNode).toHaveTextContent(
+        `${formatDate(listItem.startDate)} — ${formatDate(Date.now())}`,
+      )
+
+    expect(screen.queryByRole('button', {name: /mark as read/i})).not.toBeInTheDocument()
+})
