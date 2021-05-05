@@ -4,7 +4,7 @@ import {App} from 'app'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from  'test/data/list-items'
 import {formatDate} from 'utils/misc'
-import {loginAsUser, render, screen, userEvent, waitForLoadingToFinish} from 'test/app-test-utils'
+import {loginAsUser, render, screen, userEvent, waitFor, waitForLoadingToFinish} from 'test/app-test-utils'
 import faker from 'faker'
 
 test('renders all the book information', async () => {
@@ -98,6 +98,7 @@ test('can mark a list item as read', async () => {
 })
 
 test('can edit a note', async () => {
+    jest.useFakeTimers()
     const user = await loginAsUser()
     const book = await booksDB.create(buildBook())
     const route = `/book/${book.id}`
@@ -112,6 +113,7 @@ test('can edit a note', async () => {
     userEvent.type(notesTestarea, newNotes)
 
     await screen.findByLabelText(/loading/i)
+    await waitForLoadingToFinish()
 
     expect(notesTestarea).toHaveValue(newNotes)
 

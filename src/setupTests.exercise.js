@@ -13,6 +13,8 @@ beforeAll(() => server.listen())
 afterAll(() => server.close())
 afterEach(() => server.resetHandlers())
 
+beforeEach(() => jest.useRealTimers())
+
 // general cleanup
 afterEach(async () => {
     queryCache.clear()
