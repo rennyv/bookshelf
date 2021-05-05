@@ -4,8 +4,11 @@ import {App} from 'app'
 import * as booksDB from 'test/data/books'
 import * as listItemsDB from  'test/data/list-items'
 import {formatDate} from 'utils/misc'
-import {loginAsUser, render, screen, userEvent, waitFor, waitForLoadingToFinish} from 'test/app-test-utils'
+import {loginAsUser, render, screen, userEvent,  waitForLoadingToFinish} from 'test/app-test-utils'
 import faker from 'faker'
+
+jest.mock('components/profiler')
+
 
 test('renders all the book information', async () => {
     const book = await booksDB.create(buildBook())
